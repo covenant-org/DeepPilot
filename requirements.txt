@@ -3,4 +3,5 @@ tqdm
 sklearn
 pandas
 configparser
-tensorflow[and-cuda]
+tensorflow==2.9.0
+keras==2.9.0
