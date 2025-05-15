@@ -3,3 +3,4 @@ tqdm
 sklearn
 pandas
 configparser
+tensorflow[and-cuda]
