@@ -1,0 +1,25 @@
+{
+        "build": { 
+		"args": {
+			"REMOTE_USER": "${localEnv:USER}",
+			"REMOTE_UID": "${localEnv:REMOTE_UID:1000}",
+			"REMOTE_GID": "${localEnv:REMOTE_GID:1000}"
+		},
+		"dockerfile": "Dockerfile"
+	},
+	"privileged": true,
+        "runArgs": [
+                "--gpus", "all",
+		"-v", "/tmp/.X11-unix:/tmp/.X11-unix"
+        ],      
+        "containerEnv": {
+                "DISPLAY": "${localEnv:DISPLAY}"
+        },      
+	"initializeCommand": "REMOTE_UID=$(id -u $USER); REMOTE_GID=$(id -g $USER)",
+	"postCreateCommand": "sudo chown ${localEnv:USER}:${localEnv:USER} -R /workspace",
+	"remoteUser": "${localEnv:USER}",
+        "features": {
+                "ghcr.io/duduribeiro/devcontainer-features/neovim:1": {},
+                "ghcr.io/duduribeiro/devcontainer-features/tmux:1": {}
+        }
+}
