@@ -1,0 +1,9 @@
+Session.vim
+.catkin_workspace
+src/CMakeLists.txt
+src/iROS_drone
+src/joystick_drivers
+src/mav_comm
+build
+devel
+__pycache__
