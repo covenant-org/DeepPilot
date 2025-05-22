@@ -7,3 +7,5 @@ src/mav_comm
 build
 devel
 __pycache__
+src/DeepPilot_network/deeppilot-datasets/
+.nvimlog

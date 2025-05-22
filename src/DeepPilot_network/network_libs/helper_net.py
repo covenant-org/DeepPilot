@@ -47,7 +47,7 @@ def preprocess_2(image):
 	return images_out
 
 def get_data(dataset):
-	speed = []
+	speed https://github.com/ultralytics/ultralytics/issues/189= []
 	images = []
 	
 	with open(directory+dataset) as f:
