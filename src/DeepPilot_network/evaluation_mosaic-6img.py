@@ -56,7 +56,8 @@ class DeepPilot:
         # roll_pitch
         global model1
         model1 = net.create_posenet_3_separated_outs()
-        model1.load_weights('models/models_6img/6img_roll_pitch_model.h5')
+#        model1.load_weights('models/models_6img/6img_roll_pitch_model.h5')
+        model1.load_weights('models/test.h5')
         model1.compile(optimizer=adam, loss={'roll': net.euc_lossRoll,
                                              'pitch': net.euc_lossPitch,
                                              'yaw': net.euc_lossYaw,
@@ -65,7 +66,8 @@ class DeepPilot:
         # altitude
         global model2
         model2 = net.create_posenet_3_separated_outs()
-        model2.load_weights('models/models_6img/6img_altitude_model.h5')
+        # model2.load_weights('models/models_6img/6img_altitude_model.h5')
+        model2.load_weights('models/test.h5')
         model2.compile(optimizer=adam, loss={'roll': net.euc_lossRoll,
                                              'pitch': net.euc_lossPitch,
                                              'yaw': net.euc_lossYaw,
@@ -74,7 +76,8 @@ class DeepPilot:
         # yaw
         global model3
         model3 = net.create_posenet_3_separated_outs()
-        model3.load_weights('models/models_6img/6img_yaw_model.h5')
+#        model3.load_weights('models/models_6img/6img_yaw_model.h5')
+        model3.load_weights('models/test.h5')
         model3.compile(optimizer=adam, loss={'roll': net.euc_lossRoll,
                                              'pitch': net.euc_lossPitch,
                                              'yaw': net.euc_lossYaw,
