@@ -19,6 +19,12 @@ KeyPress::KeyPress(QWidget *parent) : nh_("~"), QWidget(parent) {
   pubCommandPilot1_ = nh_.advertise<geometry_msgs::Twist>("/bebop/cmd_vel", 3);
   pubCommandRecord1_ = nh_.advertise<std_msgs::Bool>("/bebop/record", 3);
   this->recordingMsg.data = false;
+  speed = 0.3;
+  altitude_speed = 1.0;
+  pitch = 0;
+  roll = 0;
+  yaw = 0;
+  altitude = 0;
 
   OvR = nh_.advertise<std_msgs::Int8>("/keyboard/override", 3);
 
@@ -37,12 +43,9 @@ KeyPress::KeyPress(QWidget *parent) : nh_("~"), QWidget(parent) {
   grid = new QGridLayout(this);
 
   grid->addWidget(RecordingLabel, 1, 0);
-  grid->addWidget(RecordingStateLabel, 2, 0);
+  grid->addWidget(RecordingStateLabel, 1, 1);
 
   grid->addWidget(Command, 5, 0);
-
-  Speed_value->setText(QString::number(speed));
-  Alt_speed_value->setText(QString::number(speed));
 
   setLayout(grid);
 }
@@ -81,7 +84,8 @@ void KeyPress::keyPressEvent(QKeyEvent *event) {
     Command->setText("LANDING");
     this->recordingMsg.data = false;
     this->pubCommandRecord1_.publish(this->recordingMsg);
-    RecordingStatelabel->setText("No") setLayout(grid);
+    RecordingStateLabel->setText("No");
+    setLayout(grid);
 
   } else if (event->key() == Qt::Key_X) {
     override.data = 6;
@@ -133,22 +137,16 @@ void KeyPress::keyPressEvent(QKeyEvent *event) {
     speed -= .1;
     if (speed < .1)
       speed = .1;
-    Alt_speed_value->setText(QString::number(speed));
-    Speed_value->setText(QString::number(speed));
-    setLayout(grid);
   } else if (event->key() == Qt::Key_Right) {
     speed += .1;
     if (speed > 1)
       speed = 1;
-    Alt_speed_value->setText(QString::number(speed));
-    Speed_value->setText(QString::number(speed));
-    setLayout(grid);
   } else if (event->key() == Qt::Key_R) {
     this->recordingMsg.data = !this->recordingMsg.data;
     if (!this->recordingMsg.data)
-      RecordingStatelabel->setText("No");
+      RecordingStateLabel->setText("No");
     else
-      RecordingStatelabel->setText("Yes");
+      RecordingStateLabel->setText("Yes");
     this->pubCommandRecord1_.publish(this->recordingMsg);
   }
 

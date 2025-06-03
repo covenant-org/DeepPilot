@@ -18,7 +18,7 @@ class Recorder:
         self.image_sub = rospy.Subscriber('/bebop2/camera_base/image_raw',
                                           Image, self.callback, queue_size=1,
                                           buff_size=2**24)
-        self.record_sub = rospy.Subscriber('/bebp/record',  Bool, self.record)
+        self.record_sub = rospy.Subscriber('/bebop/record',  Bool, self.record)
         self.odom_sub = rospy.Subscriber(
             '/bebop/cmd_vel', Twist, self.odom_callback, queue_size=1
         )
@@ -31,8 +31,8 @@ class Recorder:
         self.start_recording = False
 
     def record(self, data):
-        if data:
-            self.takeoff(True)
+        if data.data:
+            self.takeoffcb(True)
         else:
             self.land(True)
 
@@ -44,8 +44,7 @@ class Recorder:
         makedirs(dir, exist_ok=True)
         return dir
 
-    def takeoff(self, data):
-        print("takeoff")
+    def takeoffcb(self, data):
         self.takeoff = True
 
     def land(self, data):
