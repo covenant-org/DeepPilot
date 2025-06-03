@@ -53,3 +53,4 @@ COPY requirements.txt .
 RUN --mount=type=cache,target=/root/.cache  pip install -r requirements.txt
 
 RUN echo "source /opt/ros/noetic/setup.bash" >> ~/.bashrc
+RUN echo "export QT_GRAPHICSSYSTEM=native" >> ~/.bashrc

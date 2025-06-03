@@ -39,12 +39,7 @@ class DeepPilot:
     def __init__(self):
         # ====== ROS
         self.bridge = CvBridge()
-        self.imag1 = rospy.Subscriber(
-            '/bebop2/camera_base/image_raw', Image, self.callback, queue_size=1, buff_size=2**24)
-        self.Ovr = rospy.Subscriber('/keyboard/override', Int8, self.flag)
         self.override = 0
-        self.pub_cmd_vel_Estimation = rospy.Publisher(
-            '/bebop/cmd_vel', Twist, queue_size=10)
         self.vel_msg = Twist()
 
         # ======= DeepPilot
@@ -101,6 +96,7 @@ class DeepPilot:
         self.toc = 0.0
 
         self.alpha = 0.1
+        self.dimming = 1.0
 
         print("Loaded model from disk")
 
@@ -110,6 +106,13 @@ class DeepPilot:
 
         self.model_state = GetModelStateRequest()
         self.model_state.model_name = 'bebop2'
+        self.objstate = self.get_state_service(self.model_state)
+
+        self.imag1 = rospy.Subscriber(
+            '/bebop2/camera_base/image_raw', Image, self.callback, queue_size=1, buff_size=2**24)
+        self.Ovr = rospy.Subscriber('/keyboard/override', Int8, self.flag)
+        self.pub_cmd_vel_Estimation = rospy.Publisher(
+            '/bebop/cmd_vel', Twist, queue_size=10)
 
         print('===============  READY ================================')
         print('===============  READY ================================')
@@ -160,10 +163,11 @@ class DeepPilot:
 
             self.elapse = time() - start
 
-            self.pred_roll = round(speedpred[0][0][0], 2)
-            self.pred_pitch = round(speedpred[1][0][0], 2)
-            self.pred_yaw = round(speedpred_yaw[2][0][0], 2)
-            self.pred_altitude = round(speedpred_altitude[3][0][0], 2)
+            self.pred_roll = round(speedpred[0][0][0] * self.dimming, 2)
+            self.pred_pitch = round((speedpred[1][0][0]/4) * self.dimming, 2)
+            self.pred_yaw = round(speedpred_yaw[2][0][0] * self.dimming, 2)
+            self.pred_altitude = round(
+                speedpred_altitude[3][0][0], 2) * self.dimming
 
             self.pitch = round(self.alpha * self.pitch +
                                (1 - self.alpha) * self.pred_pitch, 2)
@@ -198,13 +202,13 @@ class DeepPilot:
                 self.altitude = 0.0
                 self.yaw = 0.0
 
-            print('Flight Command predicted		|	Smoothed Flight Command')
+            print('Predicted\t| Smoothed ')
             print('')
-            print('Roll: ',  self.pred_roll, '		|	Roll: ',  self.roll)
-            print('Pitch: ',  self.pred_pitch, '		|	Pitch: ',  self.pitch)
-            print('Yaw: ',  self.pred_yaw, '		|	Yaw: ',  self.yaw)
+            print('Roll: ',  self.pred_roll, '\t| Roll: ',  self.roll)
+            print('Pitch: ',  self.pred_pitch, '\t| Pitch: ',  self.pitch)
+            print('Yaw: ',  self.pred_yaw, '\t| Yaw: ',  self.yaw)
             print('Altitude: ',  self.pred_altitude,
-                  '	|	Altitude: ',  self.altitude)
+                  '\t| Altitude: ',  self.altitude)
             print('Drone Pose: ', round(self.objstate.pose.position.x, 2), ', ', round(
                 self.objstate.pose.position.y, 2), ', ', round(self.objstate.pose.position.z, 2))
             print('')

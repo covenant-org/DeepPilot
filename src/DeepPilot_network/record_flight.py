@@ -8,7 +8,7 @@ from datetime import datetime
 from os import path, makedirs, getcwd
 from sensor_msgs.msg import Image
 from geometry_msgs.msg import Twist
-from std_msgs.msg import Empty
+from std_msgs.msg import Empty, Bool
 from cv_bridge import CvBridge
 
 
@@ -18,9 +18,7 @@ class Recorder:
         self.image_sub = rospy.Subscriber('/bebop2/camera_base/image_raw',
                                           Image, self.callback, queue_size=1,
                                           buff_size=2**24)
-        self.takeoff_sub = rospy.Subscriber(
-            '/bebop/takeoff', Empty, self.takeoff)
-        self.land_sub = rospy.Subscriber('/bebop/land', Empty, self.land)
+        self.record_sub = rospy.Subscriber('/bebp/record',  Bool, self.record)
         self.odom_sub = rospy.Subscriber(
             '/bebop/cmd_vel', Twist, self.odom_callback, queue_size=1
         )
@@ -31,6 +29,12 @@ class Recorder:
         self.entry = 0
         self.takeoff = False
         self.start_recording = False
+
+    def record(self, data):
+        if data:
+            self.takeoff(True)
+        else:
+            self.land(True)
 
     def _mkdirnext(self):
         dir = path.join(

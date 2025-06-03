@@ -8,9 +8,9 @@ import numpy as np
 from tqdm import tqdm
 __author__ = "L. Oyuki Rojas-Perez"
 
-directory = './dataset/ardrone_dataset/'
-dataset_train = 'train/train.txt'
-dataset_test = 'test/test.txt'
+dataset_train = 'train/speeds.txt'
+directory = './dataset/'
+dataset_test = 'test/speeds.txt'
 
 
 class datasource(object):
@@ -26,6 +26,8 @@ def preprocess(images):
         X = cv2.imread(images[i])
         X = cv2.resize(X, (224, 224))
         X = np.transpose(X, (2, 0, 1))
+        mean = np.zeros((1, 3, 224, 224))
+        X = X - mean
         X = np.squeeze(X)
         X = np.transpose(X, (1, 2, 0))
         Y = np.expand_dims(X, axis=0)
