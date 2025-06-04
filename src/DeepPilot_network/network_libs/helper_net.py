@@ -8,8 +8,8 @@ import numpy as np
 from tqdm import tqdm
 __author__ = "L. Oyuki Rojas-Perez"
 
-dataset_train = 'train/speeds.txt'
 directory = './dataset/'
+dataset_train = 'train/speeds.txt'
 dataset_test = 'test/speeds.txt'
 
 

@@ -53,7 +53,7 @@ if __name__ == "__main__":
     # In this part you specify the labels for training learning and for validation
     history = model.fit(X_train, [y_train_roll, y_train_pitch, y_train_yaw, y_train_altitude],
                         batch_size=batch_size,
-                        epochs=10,
+                        epochs=100,
                         validation_data=(
                             X_test, [y_test_roll, y_test_pitch, y_test_yaw, y_test_altitude]),
                         callbacks=[checkpointer])

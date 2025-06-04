@@ -1,3 +1,5 @@
+#!/bin/python3
+
 import os
 import random
 import shutil
@@ -26,6 +28,47 @@ def move_dataset(inputdir: str, outputdir: str, initial_image_counter=0):
                     with open(distdata, "a") as dist:
                         dist.write(f"{newname} {x} {y} {z} {h}\n")
     return counter
+
+
+def decompose(inputdir: str, outputdir: str):
+    path = pathlib.Path(inputdir).resolve()
+    output = pathlib.Path(outputdir).resolve()
+    inputdata = os.path.join(path, "speeds.txt")
+    xypath = os.path.join(output, "roll_pitch")
+    zpath = os.path.join(output, "yaw")
+    hpath = os.path.join(output, "height")
+    os.makedirs(xypath, exist_ok=True)
+    os.makedirs(zpath, exist_ok=True)
+    os.makedirs(hpath, exist_ok=True)
+    xyout = open(os.path.join(xypath, "speeds.txt"), "w")
+    zout = open(os.path.join(zpath, "speeds.txt"), "w")
+    hout = open(os.path.join(hpath, "speeds.txt"), "w")
+    with open(inputdata) as input:
+        for line in input:
+            image, x, y, z, h = line.split()
+            shutil.copy(os.path.join(path, image),
+                        os.path.join(xypath, image))
+            shutil.copy(os.path.join(path, image),
+                        os.path.join(zpath, image))
+            shutil.copy(os.path.join(path, image),
+                        os.path.join(hpath, image))
+            xyline = zline = hline = f"{image} 0.0 0.0 0.0 0.0\n"
+            x = float(x)
+            y = float(y)
+            z = float(z)
+            h = float(h)
+            if abs(x) > 0 or abs(y) > 0:
+                xyline = f"{image} {x} {y} {z} {h}\n"
+            elif abs(z) > 0:
+                zline = f"{image} {x} {y} {z} {h}\n"
+            elif abs(h) > 0:
+                hline = f"{image} {x} {y} {z} {h}\n"
+            xyout.write(xyline)
+            zout.write(zline)
+            hout.write(hline)
+    xyout.close()
+    zout.close()
+    hout.close()
 
 
 def merge_datasets(inputdir: str, output: str):
@@ -103,10 +146,31 @@ def scale(inputdir: str, outputdir: str, factor=10.0):
                 outf.write(f"{image} {x} {y} {z} {h}\n")
 
 
+def dedupe(inputdir: str, outputdir: str):
+    path = pathlib.Path(inputdir).resolve()
+    output = pathlib.Path(outputdir).resolve()
+    inputdata = os.path.join(path, "speeds.txt")
+    outputdata = os.path.join(output, "speeds.txt")
+    with open(inputdata) as inf:
+        with open(outputdata, "w") as outf:
+            xl = yl = zl = hl = None
+            for line in inf:
+                image, x, y, z, h = line.split()
+                if x == xl and y == yl and z == zl and h == hl:
+                    continue
+                xl = x
+                yl = y
+                zl = z
+                hl = h
+                shutil.copy(os.path.join(path, image),
+                            os.path.join(output, image))
+                outf.write(f"{image} {x} {y} {z} {h}\n")
+
+
 def main():
     argparser = argparse.ArgumentParser(description="Join Deep Pilot datasets")
     argparser.add_argument(
-        "mode", choices=["merge", "scale", "split", "quantize", "mss"])
+        "mode", choices=["merge", "scale", "split", "quantize", "dedupe", "decompose", "mss"])
     argparser.add_argument("--scale", type=float, default=10.0)
     argparser.add_argument("--threshold", "-t", type=float, default=0.0)
     argparser.add_argument("--dir", "-d", required=True,
@@ -120,6 +184,14 @@ def main():
     args = argparser.parse_args()
     mergedir = args.dir
     print(args)
+
+    if args.mode == "decompose":
+        os.makedirs(args.output_dir, exist_ok=True)
+        decompose(args.dir, args.output_dir)
+
+    if args.mode == "dedupe":
+        os.makedirs(args.output_dir, exist_ok=True)
+        dedupe(args.dir, args.output_dir)
 
     if args.mode == "quantize":
         os.makedirs(args.output_dir, exist_ok=True)
